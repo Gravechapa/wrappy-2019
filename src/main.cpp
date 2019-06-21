@@ -21,6 +21,7 @@ int main()
             if (std::regex_match(mapName, std::regex(R"(^prob-\d+\.desc)")))
             {
                 Map map = Map::parse(mapEntry.path());
+                Map map1 = map;
             }
         }
 

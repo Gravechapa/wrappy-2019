@@ -17,6 +17,7 @@ Map Map::parse(const fs::path &path)
     auto readCoord = [&file, &fileError]()->std::pair<uint32_t, uint32_t>{
         std::pair<uint32_t, uint32_t> coord;
         char c;
+        file.get(c);
         if (c != '(')
         {
             fileError();
@@ -41,10 +42,10 @@ Map Map::parse(const fs::path &path)
     };
 
     char c;
-    std::queue<std::pair<uint32_t,uint32_t>> contourMapBuffer;
+    std::queue<std::pair<uint32_t, uint32_t>> contourMapBuffer;
     uint32_t xMax = 0;
     uint32_t yMax = 0;
-    while (file.get(c))
+    while (true)
     {
         auto coord = readCoord();
         xMax = std::max(coord.first, xMax);
@@ -71,11 +72,12 @@ Map Map::parse(const fs::path &path)
         fileError();
     }
 
-    std::queue<std::pair<uint32_t,uint32_t>> obstacleMapBuffer;
+    std::queue<std::pair<uint32_t, uint32_t>> obstacleMapBuffer;
     file.get(c);
+    file.unget();
     if (c != '#')
     {
-        do
+        while (true)
         {
             obstacleMapBuffer.push(readCoord());
 
@@ -84,19 +86,19 @@ Map Map::parse(const fs::path &path)
             {
                 break;
             }
-            if (c != ',')
+            if (c != ',' && c != ';')
             {
                 fileError();
             }
-
-        }while (file.get(c));
+        }
     }
 
-    std::queue<std::pair<short,std::pair<int32_t,int32_t>>> boosterMapBuffer;
+    std::queue<std::pair<short, std::pair<uint32_t, uint32_t>>> boosterMapBuffer;
     file.get(c);
+    file.unget();
     if (c != '#')
     {
-        do
+        while (file.get(c))
         {
             short booster;
             if (c == 'B')
@@ -129,15 +131,29 @@ Map Map::parse(const fs::path &path)
             {
                 fileError();
             }
-        }while (file.get(c));
+        }
     }
 
     Map map;
     map.mineMap = std::vector(yMax + 1, std::vector(xMax + 1, short{0}));
 
+    while (!contourMapBuffer.empty())
+    {
+        map.mineMap[contourMapBuffer.front().second][contourMapBuffer.front().first] = WALL;
+        contourMapBuffer.pop();
+    }
+
     while (!obstacleMapBuffer.empty())
     {
+        map.mineMap[obstacleMapBuffer.front().second][obstacleMapBuffer.front().first] = OBSTACLE;
+        obstacleMapBuffer.pop();
+    }
 
+    while (!boosterMapBuffer.empty())
+    {
+        map.mineMap[boosterMapBuffer.front().second.second][boosterMapBuffer.front().second.first]
+                += boosterMapBuffer.front().first << 2;
+        boosterMapBuffer.pop();
     }
 
     return map;
