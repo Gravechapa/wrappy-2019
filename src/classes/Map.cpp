@@ -1,160 +1,111 @@
 #include "Map.hpp"
 
-#include <fstream>
-#include <queue>
-
-Map Map::parse(const fs::path &path)
+Map::Map(uint32_t x, uint32_t y,
+    std::queue<std::pair<uint32_t, uint32_t>> &contourMap,
+    std::vector<std::queue<std::pair<uint32_t, uint32_t>>> &obstacleMaps)
 {
-    std::ifstream file(path.c_str());
-    if (!file.is_open())
+    _mineMap = std::vector(y + 1, std::vector(x + 1, short{WALL}));
+
+    std::pair<uint32_t, uint32_t> buffer;
+    if (!contourMap.empty())
     {
-        throw std::runtime_error("Can't open file: " + path.string());
+        buffer = contourMap.front();
+        contourMap.push(contourMap.front());
+        contourMap.pop();
     }
-    auto fileError = [&path, &file](){
-        throw std::runtime_error("Corrupt file: " + path.string()
-                                 + " pos: " + to_string(file.tellg()));};
-
-    auto readCoord = [&file, &fileError]()->std::pair<uint32_t, uint32_t>{
-        std::pair<uint32_t, uint32_t> coord;
-        char c;
-        file.get(c);
-        if (c != '(')
-        {
-            fileError();
-        }
-
-        file >> coord.first;
-
-        file.get(c);
-        if (c != ',')
-        {
-            fileError();
-        }
-
-        file >> coord.second;
-
-        file.get(c);
-        if (c != ')')
-        {
-            fileError();
-        }
-        return coord;
-    };
-
-    char c;
-    std::queue<std::pair<uint32_t, uint32_t>> contourMapBuffer;
-    uint32_t xMax = 0;
-    uint32_t yMax = 0;
-    while (true)
+    while (!contourMap.empty())
     {
-        auto coord = readCoord();
-        xMax = std::max(coord.first, xMax);
-        yMax = std::max(coord.second, yMax);
-
-        contourMapBuffer.push(coord);
-
-        file.get(c);
-        if (c == '#')
+        uint32_t i, j;
+        if (buffer.first == contourMap.front().first)
         {
-            break;
-        }
-        if (c != ',')
-        {
-            fileError();
-        }
-    }
-
-    std::pair<uint32_t, uint32_t> botCoord = readCoord();
-
-    file.get(c);
-    if (c != '#')
-    {
-        fileError();
-    }
-
-    std::queue<std::pair<uint32_t, uint32_t>> obstacleMapBuffer;
-    file.get(c);
-    file.unget();
-    if (c != '#')
-    {
-        while (true)
-        {
-            obstacleMapBuffer.push(readCoord());
-
-            file.get(c);
-            if (c == '#')
+            if (buffer.second > contourMap.front().second)
             {
-                break;
-            }
-            if (c != ',' && c != ';')
-            {
-                fileError();
-            }
-        }
-    }
-
-    std::queue<std::pair<short, std::pair<uint32_t, uint32_t>>> boosterMapBuffer;
-    file.get(c);
-    file.unget();
-    if (c != '#')
-    {
-        while (file.get(c))
-        {
-            short booster;
-            if (c == 'B')
-            {
-                booster = CODEB;
-            }
-            else if (c == 'F')
-            {
-                booster = CODEF;
-            }
-            else if (c == 'L')
-            {
-                booster = CODEL;
-            }
-            else if (c == 'X')
-            {
-                booster = CODEX;
+                i = contourMap.front().second;
+                j = buffer.second;
             }
             else
             {
-                fileError();
+                i = buffer.second;
+                j = contourMap.front().second;
             }
-            boosterMapBuffer.push(std::pair(booster, readCoord()));
-
-            if (!file.get(c))
+            for (; i < j; ++i)
             {
-                break;
-            }
-            if (c != ';')
-            {
-                fileError();
+                _mineMap[i][contourMap.front().first] = EMPTY;
             }
         }
+        else
+        {
+            if (buffer.first > contourMap.front().first)
+            {
+                i = contourMap.front().first;
+                j = buffer.first;
+            }
+            else
+            {
+                i = buffer.first;
+                j = contourMap.front().first;
+            }
+            for (; i < j; ++i)
+            {
+                _mineMap[contourMap.front().second][i] = EMPTY;
+            }
+        }
+        buffer = contourMap.front();
+        contourMap.pop();
     }
 
-    Map map;
-    map.mineMap = std::vector(yMax + 1, std::vector(xMax + 1, short{0}));
-
-    while (!contourMapBuffer.empty())
+    for (auto &obstacleMap : obstacleMaps)
     {
-        map.mineMap[contourMapBuffer.front().second][contourMapBuffer.front().first] = WALL;
-        contourMapBuffer.pop();
+        if (!obstacleMap.empty())
+        {
+            buffer = obstacleMap.front();
+            obstacleMap.push(obstacleMap.front());
+            obstacleMap.pop();
+        }
+        while (!obstacleMap.empty())
+        {
+            uint32_t i, j;
+            if (buffer.first == obstacleMap.front().first)
+            {
+                if (buffer.second > obstacleMap.front().second)
+                {
+                    i = obstacleMap.front().second;
+                    j = buffer.second;
+                }
+                else
+                {
+                    i = buffer.second;
+                    j = obstacleMap.front().second;
+                }
+                for (; i < j; i++)
+                {
+                    _mineMap[i][obstacleMap.front().first] = OBSTACLE;
+                }
+            }
+            else
+            {
+                if (buffer.first > obstacleMap.front().first)
+                {
+                    i = obstacleMap.front().first;
+                    j = buffer.first;
+                }
+                else
+                {
+                    i = buffer.first;
+                    j = obstacleMap.front().first;
+                }
+                for (; i < j; i++)
+                {
+                    _mineMap[obstacleMap.front().second][i] = OBSTACLE;
+                }
+            }
+            buffer = obstacleMap.front();
+            obstacleMap.pop();
+        }
     }
+}
 
-    while (!obstacleMapBuffer.empty())
-    {
-        map.mineMap[obstacleMapBuffer.front().second][obstacleMapBuffer.front().first] = OBSTACLE;
-        obstacleMapBuffer.pop();
-    }
-
-    while (!boosterMapBuffer.empty())
-    {
-        map.mineMap[boosterMapBuffer.front().second.second][boosterMapBuffer.front().second.first]
-                += boosterMapBuffer.front().first << 2;
-        boosterMapBuffer.pop();
-    }
-
-    return map;
+const std::vector<std::vector<short>>& Map::getMap() const
+{
+    return _mineMap;
 }

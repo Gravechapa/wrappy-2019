@@ -1,8 +1,11 @@
 #include <regex>
-#include "Map.hpp"
+#include "Simulation.hpp"
+
+#include <SFML/Graphics.hpp>
 
 int main()
 {
+
     auto outputDir = fs::path("solutions");
     if (fs::exists(outputDir))
             {
@@ -20,8 +23,8 @@ int main()
             std::string mapName = mapEntry.path().filename().string();
             if (std::regex_match(mapName, std::regex(R"(^prob-\d+\.desc)")))
             {
-                Map map = Map::parse(mapEntry.path());
-                Map map1 = map;
+                Simulation sim = Simulation(mapEntry.path());
+                sim.run();
             }
         }
 

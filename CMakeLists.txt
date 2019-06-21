@@ -34,6 +34,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
+find_package(SFML 2.4 COMPONENTS system window graphics network audio REQUIRED)
+include_directories(${SFML_INCLUDE_DIR})
+
 set(FILESYSTEM stdc++fs)
 add_executable(${EXECUTABLE} ${SOURCES} ${HEADERS})
 if(MSVC)
@@ -42,7 +46,7 @@ if(MSVC)
     VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
 add_dependencies(${EXECUTABLE} wrappy-2019)
-target_link_libraries(${EXECUTABLE} ${FILESYSTEM})
+target_link_libraries(${EXECUTABLE} ${FILESYSTEM} ${SFML_LIBRARIES})
 
 
 #############Copies data files to a binary directory####################################

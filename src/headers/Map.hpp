@@ -1,14 +1,7 @@
 #pragma once
 
-#ifdef UNIX
-#include <filesystem>
-namespace fs = std::filesystem;
-#endif
-
-#ifdef WINDOWS
-#include <filesystem>
-namespace fs = std::experimental::filesystem::v1;
-#endif
+#include <queue>
+#include <cstdint>
 
 enum Booster: short
 {
@@ -29,10 +22,15 @@ enum soil: short
 class Map
 {
 public:
-    static Map parse(const fs::path &path);
+    Map(){}
+    Map(uint32_t x, uint32_t y,
+        std::queue<std::pair<uint32_t, uint32_t>> &contourMap,
+        std::vector<std::queue<std::pair<uint32_t, uint32_t>>> &obstacleMaps);
+
+    const std::vector<std::vector<short>>& getMap() const;
 
 private:
-    Map(){}
 
-    std::vector<std::vector<short>> mineMap;
+    std::vector<std::vector<short>> _mineMap;
+
 };
