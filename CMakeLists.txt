@@ -45,6 +45,6 @@ file (GLOB_RECURSE MAPS RELATIVE "${DATA_FILES_DIR}" "${DATA_FILES_DIR}/part-1/*
 
 foreach(MAP ${MAPS})
     configure_file(${DATA_FILES_DIR}/${MAP}
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${MAP} COPYONLY)
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/maps/${MAP} COPYONLY)
 endforeach(MAP)
 #########################################################################################
