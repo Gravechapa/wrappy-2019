@@ -8,6 +8,12 @@ set(SOURCE_ROOT src)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+if (UNIX)
+    add_definitions(-DUNIX)
+elseif (WIN32)
+    add_definitions(-DWINDOWS)
+endif ()
+
 set(EXTERNAL_PROJECTS_DIR "cmake_externalprojects")
 
 message(STATUS "Starting collecting files")
