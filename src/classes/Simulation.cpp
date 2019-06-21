@@ -87,11 +87,11 @@ Simulation::Simulation(const fs::path &path)
             {
                 break;
             }
-            if (c != ',')
+            if (c == ',')
             {
                 continue;
             }
-            else if (c != ';')
+            else if (c == ';')
             {
                 obstacleMapsBuffer.push_back(std::queue<std::pair<uint32_t, uint32_t>>());
                 continue;

@@ -11,22 +11,23 @@ void GUI::updateMap(Map &map)
     const auto& mineMap = map.getMap();
     if ((_resolution.x / _resolution.y) * mineMap.size() >= mineMap[0].size())
     {
-        float scale = (mineMap.size() * _tileSize.y) / _resolution.y;
+        float scale = (mineMap.size() * _tileSize.y) / static_cast<float>(_resolution.y);
         _view.setSize({_resolution.x * scale, static_cast<float>(mineMap.size() * _tileSize.y)});
     }
     else
     {
-        float scale = (mineMap[0].size() * _tileSize.x) / _resolution.x;
+        float scale = (mineMap[0].size() * _tileSize.x) / static_cast<float>(_resolution.x);
         _view.setSize({static_cast<float>(mineMap[0].size() * _tileSize.x), _resolution.y * scale});
     }
-    _view.setCenter(mineMap[0].size() * _tileSize.x / 2, mineMap.size() * _tileSize.y / 2);
+    _view.setCenter(mineMap[0].size() * _tileSize.x / 2.f, mineMap.size() * _tileSize.y / 2.f);
 
     for (uint32_t i = 0; i < mineMap.size(); ++i)
     {
         for (uint32_t j = 0; j < mineMap[0].size(); ++j)
         {
             sf::Color color;
-            switch (mineMap[i][j])
+            sf::Color color2 = sf::Color::Red;
+            switch (mineMap[(mineMap.size() - i - 1)][j])
             {
                 case WALL:
                     color = sf::Color::Black;
@@ -42,25 +43,25 @@ void GUI::updateMap(Map &map)
                     break;
             }
 
-                _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>(j * _tileSize.x),
-                    static_cast<float>(i * _tileSize.y)), color));
+            _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>(j * _tileSize.x),
+                static_cast<float>(i * _tileSize.y)), color));
 
-                _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>((j + 1) * _tileSize.x),
-                    static_cast<float>(i * _tileSize.y)), color));
+            _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>((j + 1) * _tileSize.x),
+                static_cast<float>(i * _tileSize.y)), color));
 
-                _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>((j + 1) * _tileSize.x),
-                    static_cast<float>((i + 1) * _tileSize.y)), color));
+            _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>((j + 1) * _tileSize.x),
+                static_cast<float>((i + 1) * _tileSize.y)), color));
 
-                _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>((j + 1) * _tileSize.x),
-                    static_cast<float>((i + 1) * _tileSize.y)), color));
+            _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>((j + 1) * _tileSize.x),
+                static_cast<float>((i + 1) * _tileSize.y)), color2));
 
-                _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>(j * _tileSize.x),
-                    static_cast<float>((i + 1) * _tileSize.y)), color));
+            _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>(j * _tileSize.x),
+                static_cast<float>((i + 1) * _tileSize.y)), color2));
 
-                _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>(j * _tileSize.x),
-                    static_cast<float>(i * _tileSize.y)), color));
-            }
+            _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>(j * _tileSize.x),
+                static_cast<float>(i * _tileSize.y)), color2));
         }
+    }
 }
 
 bool GUI::checkCloseEvent()

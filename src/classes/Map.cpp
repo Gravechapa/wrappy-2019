@@ -28,7 +28,7 @@ Map::Map(uint32_t x, uint32_t y,
                 i = buffer.second;
                 j = contourMap.front().second;
             }
-            for (; i < j; ++i)
+            for (; i <= j; ++i)
             {
                 _mineMap[i][contourMap.front().first] = EMPTY;
             }
@@ -45,7 +45,7 @@ Map::Map(uint32_t x, uint32_t y,
                 i = buffer.first;
                 j = contourMap.front().first;
             }
-            for (; i < j; ++i)
+            for (; i <= j; ++i)
             {
                 _mineMap[contourMap.front().second][i] = EMPTY;
             }
@@ -77,7 +77,7 @@ Map::Map(uint32_t x, uint32_t y,
                     i = buffer.second;
                     j = obstacleMap.front().second;
                 }
-                for (; i < j; i++)
+                for (; i <= j; ++i)
                 {
                     _mineMap[i][obstacleMap.front().first] = OBSTACLE;
                 }
@@ -94,7 +94,7 @@ Map::Map(uint32_t x, uint32_t y,
                     i = buffer.first;
                     j = obstacleMap.front().first;
                 }
-                for (; i < j; i++)
+                for (; i <= j; ++i)
                 {
                     _mineMap[obstacleMap.front().second][i] = OBSTACLE;
                 }
