@@ -122,16 +122,16 @@ Map::Map(uint32_t x, uint32_t y,
                         }
 
                         if ((*contour)[dotNumber].second ==
-                                (*contour)[(dotNumber - 1) < 0 ? contour->size() - dotNumber : dotNumber - 1].second)
+                                (*contour)[dotNumber == 0 ? contour->size() - 1 : dotNumber - 1].second)
                         {
                             prevVectorDirection =
-                                    (*contour)[(dotNumber - 1) < 0 ? contour->size() - dotNumber : dotNumber - 1].second -
-                                    (*contour)[(dotNumber - 2) < 0 ? contour->size() - dotNumber - 1 : dotNumber - 2].second;
+                                    (*contour)[dotNumber == 0 ? contour->size() - 1 : dotNumber - 1].second -
+                                    (*contour)[dotNumber < 2 ? contour->size() - 2 : dotNumber - 2].second;
                         }
                         else
                         {
                             prevVectorDirection = (*contour)[dotNumber].second -
-                                    (*contour)[(dotNumber - 1) < 0 ? contour->size() - dotNumber : dotNumber - 1].second;
+                                    (*contour)[dotNumber == 0 ? contour->size() - 1 : dotNumber - 1].second;
                         }
 
                         if (nextVectorDirection == 0 || prevVectorDirection == 0)

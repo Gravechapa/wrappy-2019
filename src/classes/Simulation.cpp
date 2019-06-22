@@ -4,7 +4,7 @@
 #include <queue>
 
 
-Simulation::Simulation(const fs::path &path)
+Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
 {
     std::ifstream file(path.c_str());
     if (!file.is_open())

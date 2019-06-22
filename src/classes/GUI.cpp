@@ -1,6 +1,8 @@
 #include "GUI.hpp"
 
-GUI::GUI(): _window(sf::RenderWindow (sf::VideoMode(_resolution.x, _resolution.y), "wrappy-2019", sf::Style::Close))
+GUI::GUI(const std::string &name):
+    _window(sf::RenderWindow (sf::VideoMode(_resolution.x, _resolution.y),
+                              "wrappy-2019 " + name, sf::Style::Close))
 {
     _window.setFramerateLimit(120);
     _tileMap.setPrimitiveType(sf::Triangles);
@@ -8,16 +10,18 @@ GUI::GUI(): _window(sf::RenderWindow (sf::VideoMode(_resolution.x, _resolution.y
 
 void GUI::updateMap(Map &map)
 {
+    auto floatingResolution = sf::Vector2f(_resolution);
     const auto& mineMap = map.getMap();
-    if ((_resolution.x / _resolution.y) * mineMap.size() >= mineMap[0].size())
+    if ((floatingResolution.x / floatingResolution.y) * mineMap.size()
+            >= mineMap[0].size())
     {
-        float scale = (mineMap.size() * _tileSize.y) / static_cast<float>(_resolution.y);
-        _view.setSize({_resolution.x * scale, static_cast<float>(mineMap.size() * _tileSize.y)});
+        float scale = (mineMap.size() * _tileSize.y) / floatingResolution.y;
+        _view.setSize({floatingResolution.x * scale, mineMap.size() * _tileSize.y});
     }
     else
     {
-        float scale = (mineMap[0].size() * _tileSize.x) / static_cast<float>(_resolution.x);
-        _view.setSize({static_cast<float>(mineMap[0].size() * _tileSize.x), _resolution.y * scale});
+        float scale = (mineMap[0].size() * _tileSize.x) / floatingResolution.x;
+        _view.setSize({mineMap[0].size() * _tileSize.x, floatingResolution.y * scale});
     }
     _view.setCenter(mineMap[0].size() * _tileSize.x / 2.f, mineMap.size() * _tileSize.y / 2.f);
 

@@ -6,7 +6,7 @@
 class GUI
 {
 public:
-    GUI();
+    GUI(const std::string &name);
 
     void updateMap(Map &map);
     bool checkCloseEvent();
