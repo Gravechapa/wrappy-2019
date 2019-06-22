@@ -3,6 +3,7 @@
 #include <fstream>
 #include <queue>
 
+
 Simulation::Simulation(const fs::path &path)
 {
     std::ifstream file(path.c_str());
@@ -43,7 +44,7 @@ Simulation::Simulation(const fs::path &path)
     };
 
     char c;
-    std::queue<std::pair<uint32_t, uint32_t>> contourMapBuffer;
+    std::vector<std::pair<uint32_t, uint32_t>> contourMapBuffer;
     uint32_t xMax = 0;
     uint32_t yMax = 0;
     while (true)
@@ -52,7 +53,7 @@ Simulation::Simulation(const fs::path &path)
         xMax = std::max(coord.first, xMax);
         yMax = std::max(coord.second, yMax);
 
-        contourMapBuffer.push(coord);
+        contourMapBuffer.push_back(coord);
 
         file.get(c);
         if (c == '#')
