@@ -14,7 +14,7 @@ public:
 
 private:
     const sf::Vector2f _tileSize{64.f, 64.f};
-    const sf::Vector2<uint32_t> _resolution{1200, 675};
+    const sf::Vector2<uint32_t> _resolution{1600, 900};
 
     sf::RenderWindow _window;
     sf::View _view;

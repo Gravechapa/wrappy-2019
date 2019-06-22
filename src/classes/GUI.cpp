@@ -26,14 +26,14 @@ void GUI::updateMap(Map &map)
         for (uint32_t j = 0; j < mineMap[0].size(); ++j)
         {
             sf::Color color;
-            sf::Color color2 = sf::Color::Red;
+            //sf::Color color2 = sf::Color::Red;
             switch (mineMap[(mineMap.size() - i - 1)][j])
             {
                 case WALL:
                     color = sf::Color::Black;
                     break;
                 case OBSTACLE:
-                    color = sf::Color::Cyan;
+                    color = sf::Color(60, 60, 60);
                     break;
                 case EMPTY:
                     color = sf::Color::White;
@@ -53,13 +53,13 @@ void GUI::updateMap(Map &map)
                 static_cast<float>((i + 1) * _tileSize.y)), color));
 
             _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>((j + 1) * _tileSize.x),
-                static_cast<float>((i + 1) * _tileSize.y)), color2));
+                static_cast<float>((i + 1) * _tileSize.y)), color));
 
             _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>(j * _tileSize.x),
-                static_cast<float>((i + 1) * _tileSize.y)), color2));
+                static_cast<float>((i + 1) * _tileSize.y)), color));
 
             _tileMap.append(sf::Vertex(sf::Vector2f(static_cast<float>(j * _tileSize.x),
-                static_cast<float>(i * _tileSize.y)), color2));
+                static_cast<float>(i * _tileSize.y)), color));
         }
     }
 }

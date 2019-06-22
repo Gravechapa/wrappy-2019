@@ -74,14 +74,14 @@ Simulation::Simulation(const fs::path &path)
         fileError();
     }
 
-    std::vector<std::queue<std::pair<uint32_t, uint32_t>>> obstacleMapsBuffer(1);
+    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> obstacleMapsBuffer(1);
     file.get(c);
     file.unget();
     if (c != '#')
     {
         while (true)
         {
-            obstacleMapsBuffer.back().push(readCoord());
+            obstacleMapsBuffer.back().push_back(readCoord());
 
             file.get(c);
             if (c == '#')
@@ -94,7 +94,7 @@ Simulation::Simulation(const fs::path &path)
             }
             else if (c == ';')
             {
-                obstacleMapsBuffer.push_back(std::queue<std::pair<uint32_t, uint32_t>>());
+                obstacleMapsBuffer.push_back(std::vector<std::pair<uint32_t, uint32_t>>());
                 continue;
             }
             else
