@@ -8,7 +8,9 @@ Map::Map(uint32_t x, uint32_t y,
     std::vector<std::queue<std::pair<uint32_t, uint32_t>>> &obstacleMaps)
 {
     _mineMap = std::vector(y, std::vector(x, short{WALL}));
-    auto dotMaps = std::vector(y + 1, std::vector(x + 1, short{WALL}));
+    auto dotMaps = std::vector((y * 2) + 1, std::vector((x * 2) + 1, short{WALL}));
+
+
 
     auto fill = [&dotMaps](short target, std::vector<std::pair<uint32_t, uint32_t>> &contour){
             uint32_t intersectionDetectCounter;
@@ -41,7 +43,7 @@ Map::Map(uint32_t x, uint32_t y,
                         auto it = std::find_if(
                             contour.begin(), contour.end(),
                             [i, j](const std::pair<uint32_t, uint32_t>& x){
-                            return x.first == j - 1 && x.second == i;
+                            return x.first == (j - 1) / 2 && x.second == i / 2;
                         });
                         if (it ==  contour.end())
                         {
@@ -84,7 +86,7 @@ Map::Map(uint32_t x, uint32_t y,
                         prevVectorDirection = prevVectorDirection > 0 ? 1 : -1;
                         if (nextVectorDirection + prevVectorDirection == 0)
                         {
-                            if (j - 1 == contour[(dotNumber + 1) % contour.size()].first)
+                            if ((j - 1) / 2 == contour[(dotNumber + 1) % contour.size()].first)
                             {
                                 if (nextVectorDirection > 0)
                                 {
@@ -143,9 +145,11 @@ Map::Map(uint32_t x, uint32_t y,
                 i = contourMap[k].second;
                 j = contourMap[next].second;
             }
+            i *= 2;
+            j *= 2;
             for (; i <= j; ++i)
             {
-                dotMaps[i][contourMap[next].first] = EMPTY;
+                dotMaps[i][contourMap[next].first * 2] = EMPTY;
             }
         }
         else
@@ -160,25 +164,35 @@ Map::Map(uint32_t x, uint32_t y,
                 i = contourMap[k].first;
                 j = contourMap[next].first;
             }
+            i *= 2;
+            j *= 2;
             for (; i <= j; ++i)
             {
-                dotMaps[contourMap[next].second][i] = EMPTY;
+                dotMaps[contourMap[next].second * 2][i] = EMPTY;
             }
         }
     }
 
     fill(EMPTY, contourMap);
-    for (uint32_t i = 0; i < dotMaps.size() - 1; ++i)
+    for (uint32_t i = 0; i < dotMaps.size() - 2; i += 2)
     {
-        for (uint32_t j = 0; j < dotMaps[0].size() - 1; ++j)
+        for (uint32_t j = 0; j < dotMaps[0].size() - 2; j += 2)
         {
-            bool d0 = dotMaps[i][j] == EMPTY;
+            /*bool d0 = dotMaps[i][j] == EMPTY;
             bool d1 = dotMaps[i][j + 1] == EMPTY;
             bool d2 = dotMaps[i + 1][j] == EMPTY;
-            bool d3 = dotMaps[i + 1][j + 1] == EMPTY;
-            if (d0 && d1 && d2 && d3)
+            bool d3 = dotMaps[i + 1][j + 1] == EMPTY;*/
+            bool result = true;
+            for (uint32_t k = 0; k < 3; ++k)
             {
-                _mineMap[i][j] = EMPTY;
+                for (uint32_t n = 0; n < 3; ++n)
+                {
+                    result = result && dotMaps[i + k][j + n] == EMPTY;
+                }
+            }
+            if (result)
+            {
+                _mineMap[i / 2][j / 2] = EMPTY;
             }
         }
     }
