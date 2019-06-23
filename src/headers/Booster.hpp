@@ -2,19 +2,22 @@
 
 #include <SFML/System.hpp>
 
-enum BoosterType: short
-{
-    MANIPULATORBUFFB = 0,
-    CLONINGBUFF,
-    FASTBUFF,
-    DRILLBUFF,
-    TELEPORTBUFF,
-    BUFFX
-};
-
 class Booster
 {
 public:
+    enum BoosterType: short
+    {
+        MANIPULATORBUFFB = 0,
+        CLONINGBUFF,
+        FASTBUFF,
+        DRILLBUFF,
+        TELEPORTBUFF,
+        BUFFX
+    };
+
+    static const short FASTTIME;
+    static const short DRILLTIME;
+
     Booster(BoosterType type, const sf::Vector2<uint32_t> &coords);
 
     BoosterType getType() const;

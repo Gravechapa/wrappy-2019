@@ -2,19 +2,19 @@
 
 #include <cstdint>
 #include <vector>
-#include <SFML/System.hpp>
-
-enum soil: short
-{
-    EMPTY = 0,
-    PREPARED,
-    WALL,
-    OBSTACLE
-};
+#include <SFML/System/Vector2.hpp>
 
 class Map
 {
 public:
+    enum soil: short
+    {
+        EMPTY = 0,
+        PREPARED,
+        WALL,
+        OBSTACLE
+    };
+
     Map(){}
     Map(uint32_t x, uint32_t y,
         std::vector<sf::Vector2<uint32_t>> &contourMap,

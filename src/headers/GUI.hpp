@@ -2,16 +2,16 @@
 
 #include <SFML/Graphics.hpp>
 #include "Map.hpp"
-#include "Booster.hpp"
-#include <list>
+#include "Bot.hpp"
 
 class GUI
 {
 public:
     GUI(const std::string &name);
 
-    void updateMap(Map &map);
+    void updateMap(const Map &map);
     void updateBoosters(const std::list<Booster> &boosters);
+    void updateBot(const Bot &bot);
     bool checkCloseEvent();
     void draw();
 
@@ -23,4 +23,5 @@ private:
     sf::View _view;
     sf::VertexArray _tileMap;
     std::list<sf::CircleShape> _boostersTextures;
+    sf::CircleShape _botTexture;
 };

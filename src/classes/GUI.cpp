@@ -6,9 +6,11 @@ GUI::GUI(const std::string &name):
 {
     _window.setFramerateLimit(120);
     _tileMap.setPrimitiveType(sf::Triangles);
+    _botTexture.setRadius(std::min(_tileSize.x, _tileSize.y) / 4);
+    _botTexture.setFillColor(sf::Color::Red);
 }
 
-void GUI::updateMap(Map &map)
+void GUI::updateMap(const Map &map)
 {
     _tileMap.clear();
     auto floatingResolution = sf::Vector2f(_resolution);
@@ -34,16 +36,16 @@ void GUI::updateMap(Map &map)
             //sf::Color color2 = sf::Color::Red;
             switch (mineMap[i][j])
             {
-                case WALL:
+                case Map::WALL:
                     color = sf::Color::Black;
                     break;
-                case OBSTACLE:
+                case Map::OBSTACLE:
                     color = sf::Color(60, 60, 60);
                     break;
-                case EMPTY:
+                case Map::EMPTY:
                     color = sf::Color::White;
                     break;
-                case PREPARED:
+                case Map::PREPARED:
                     color = sf::Color::Yellow;
                     break;
             }
@@ -79,22 +81,22 @@ void GUI::updateBoosters(const std::list<Booster> &boosters)
 
         switch (booster.getType())
         {
-            case MANIPULATORBUFFB:
+            case Booster::MANIPULATORBUFFB:
                 circle.setFillColor(sf::Color::Green);
                 break;
-            case CLONINGBUFF:
+            case Booster::CLONINGBUFF:
                 circle.setFillColor(sf::Color(255, 0, 255));
                 break;
-            case FASTBUFF:
+            case Booster::FASTBUFF:
                 circle.setFillColor(sf::Color(70, 130, 180));
                 break;
-            case DRILLBUFF:
+            case Booster::DRILLBUFF:
                 circle.setFillColor(sf::Color(60, 60, 60));
                 break;
-            case TELEPORTBUFF:
+            case Booster::TELEPORTBUFF:
                 circle.setFillColor(sf::Color(218, 165, 32));
                 break;
-            case BUFFX:
+            case Booster::BUFFX:
                 circle.setFillColor(sf::Color(0, 0, 0));
                 break;
         }
@@ -103,6 +105,12 @@ void GUI::updateBoosters(const std::list<Booster> &boosters)
                            (booster.getCoords().y * -_tileSize.y) - _tileSize.y / 2 - rad);
         _boostersTextures.push_back(circle);
     }
+}
+
+void GUI::updateBot(const Bot &bot)
+{
+    _botTexture.setPosition((bot.getCoords().x * _tileSize.x) + _tileSize.x / 2 - _botTexture.getRadius(),
+                            (bot.getCoords().y * -_tileSize.y) - _tileSize.y / 2 - _botTexture.getRadius());
 }
 
 bool GUI::checkCloseEvent()
@@ -125,6 +133,7 @@ void GUI::draw()
     _window.clear(sf::Color::Black);
     _window.setView(_view);
     _window.draw(_tileMap);
+    _window.draw(_botTexture);
     for (auto &booster : _boostersTextures)
     {
         _window.draw(booster);

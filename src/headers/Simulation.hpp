@@ -9,7 +9,6 @@ namespace fs = std::experimental::filesystem::v1;
 #endif
 
 #include "GUI.hpp"
-#include "Booster.hpp"
 
 class Simulation
 {
@@ -22,4 +21,5 @@ private:
     Map _map;
     GUI _gui;
     std::list<Booster> _boosters;
+    Bot _bot;
 };

@@ -66,7 +66,7 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
         }
     }
 
-    /*map._botInitialLocation = */readCoord();
+    _bot = Bot(readCoord());
 
     file.get(c);
     if (c != '#')
@@ -110,30 +110,30 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
     {
         while (file.get(c))
         {
-            BoosterType booster;
+            Booster::BoosterType booster;
             if (c == 'B')
             {
-                booster = MANIPULATORBUFFB;
+                booster = Booster::MANIPULATORBUFFB;
             }
             else if (c == 'C')
             {
-                booster = CLONINGBUFF;
+                booster = Booster::CLONINGBUFF;
             }
             else if (c == 'F')
             {
-                booster = FASTBUFF;
+                booster = Booster::FASTBUFF;
             }
             else if (c == 'L')
             {
-                booster = DRILLBUFF;
+                booster = Booster::DRILLBUFF;
             }
             else if (c == 'R')
             {
-                booster = TELEPORTBUFF;
+                booster = Booster::TELEPORTBUFF;
             }
             else if (c == 'X')
             {
-                booster = BUFFX;
+                booster = Booster::BUFFX;
             }
             else
             {
@@ -160,6 +160,7 @@ void Simulation::run()
     while(!_gui.checkCloseEvent())
     {
         _gui.updateBoosters(_boosters);
+        _gui.updateBot(_bot);
         _gui.draw();
     }
 }
