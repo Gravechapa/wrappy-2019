@@ -7,12 +7,24 @@
 class GUI
 {
 public:
+    enum event
+    {
+        NEXT,
+        GOUP,
+        GODOWN,
+        GOLEFT,
+        GORIGHT,
+        ROTATECL,
+        ROTATECCL,
+        LASTEV,
+        EMPTY
+    };
     GUI(const std::string &name);
 
     void updateMap(const Map &map);
     void updateBoosters(const std::list<Booster> &boosters);
     void updateBot(const Bot &bot);
-    bool checkCloseEvent();
+    event checkEvent();
     void draw();
 
 private:

@@ -113,7 +113,7 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
             Booster::BoosterType booster;
             if (c == 'B')
             {
-                booster = Booster::MANIPULATORBUFFB;
+                booster = Booster::MANIPULATORBUFF;
             }
             else if (c == 'C')
             {
@@ -152,16 +152,96 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
         }
     }
     _map = Map(xMax, yMax, contourMapBuffer, obstacleMapsBuffer);
-    //
     _map.updateMap(_bot);
-    //
     _gui.updateMap(_map);
+}
+
+void Simulation::rotate(bool clockwise)
+{
+    ++_time;
+    _bot.rotate(clockwise);
+    _map.updateMap(_bot);
+    _gui.updateMap(_map);
+}
+
+void Simulation::move(Bot::Direction direction)
+{
+    ++_time;
+    sf::Vector2<int32_t> offset{0, 0};
+    switch (direction)
+    {
+    case Bot::UP:
+        ++offset.y;
+        break;
+    case Bot::DOWN:
+        --offset.y;
+        break;
+    case Bot::LEFT:
+        --offset.x;
+        break;
+    case Bot::RIGHT:
+        ++offset.x;
+        break;
+    }
+    for (int32_t i = 0; i < _bot.getSpeed(); ++i)
+    {
+        if (_map.check(_bot, offset))
+        {
+            _bot.move(offset);
+            _map.updateMap(_bot);
+        }
+        else
+        {
+            break;
+        }
+    }
+    _gui.updateMap(_map);
+}
+
+void Simulation::useBooster(Booster::BoosterType type, std::optional<sf::Vector2<int32_t>> coords)
+{
+    ++_time;
+
 }
 
 void Simulation::run()
 {
-    while(!_gui.checkCloseEvent())
+    bool stop = false;
+    while(!stop)
     {
+        bool stopPolling = false;
+        while (!stopPolling)
+        {
+            switch(_gui.checkEvent())
+            {
+            case GUI::NEXT:
+                stop = true;
+                break;
+            case GUI::GOUP:
+                move(Bot::UP);
+                break;
+            case GUI::GODOWN:
+                move(Bot::DOWN);
+                break;
+            case GUI::GOLEFT:
+                move(Bot::LEFT);
+                break;
+            case GUI::GORIGHT:
+                move(Bot::RIGHT);
+                break;
+            case GUI::ROTATECL:
+                rotate(true);
+                break;
+            case GUI::ROTATECCL:
+                rotate(false);
+                break;
+            case GUI::LASTEV:
+                stopPolling = true;
+                break;
+            case GUI::EMPTY:
+                break;
+            }
+        }
         _gui.updateBoosters(_boosters);
         _gui.updateBot(_bot);
         _gui.draw();

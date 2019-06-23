@@ -7,7 +7,7 @@ class Booster
 public:
     enum BoosterType: short
     {
-        MANIPULATORBUFFB = 0,
+        MANIPULATORBUFF = 0,
         CLONINGBUFF,
         FASTBUFF,
         DRILLBUFF,

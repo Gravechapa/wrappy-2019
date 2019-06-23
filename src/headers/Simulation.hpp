@@ -18,8 +18,13 @@ public:
 
 private:
 
+    void rotate(bool clockwise);
+    void move(Bot::Direction direction);
+    void useBooster(Booster::BoosterType type, std::optional<sf::Vector2<int32_t>> coords);
+
     Map _map;
     GUI _gui;
     std::list<Booster> _boosters;
     Bot _bot;
+    uint32_t _time{0};
 };

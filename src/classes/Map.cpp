@@ -236,15 +236,38 @@ Map::Map(uint32_t x, uint32_t y,
     }
 }
 
+bool Map::check(Bot &bot, sf::Vector2<int32_t> direction)
+{
+
+    int32_t targetX = static_cast<int32_t>(bot.getCoords().x) + direction.x;
+    int32_t targetY = static_cast<int32_t>(bot.getCoords().y) + direction.y;
+
+    if (targetY < _mineMap.size() && targetX < _mineMap[0].size() && targetY >= 0 && targetX >= 0)
+    {
+        if (_mineMap[targetY][targetX] == WALL || _mineMap[targetY][targetX] == OBSTACLE)
+        {
+            if (bot.hasDrill())
+            {
+                _mineMap[targetY][targetX] == EMPTY;
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
 void Map::updateMap(Bot &bot)
 {
+    double rad = bot.getDirection() * M_PI / 180;
     for (auto& dot : bot.getManipulator())
     {
-        double rad = bot.getDirection() * M_PI / 180;
-        int32_t manX = (dot.first.x * std::cos(rad) - dot.first.y * std::sin(rad)) + bot.getCoords().x;
-        int32_t manY = (dot.first.y * std::cos(rad) - dot.first.x * std::sin(rad)) + bot.getCoords().y;
 
-        if (manY < _mineMap.size() && manX < _mineMap[0].size())
+        int32_t manX = std::round((dot.first.x * std::cos(rad) - dot.first.y * std::sin(rad))) + bot.getCoords().x;
+        int32_t manY = std::round((dot.first.y * std::cos(rad) + dot.first.x * std::sin(rad))) + bot.getCoords().y;
+
+        if (manY < _mineMap.size() && manX < _mineMap[0].size() && manY >= 0 && manX >= 0)
         {
             if (_mineMap[manY][manX] == EMPTY)
             {

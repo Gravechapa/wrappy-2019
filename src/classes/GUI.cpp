@@ -82,7 +82,7 @@ void GUI::updateBoosters(const std::list<Booster> &boosters)
 
         switch (booster.getType())
         {
-            case Booster::MANIPULATORBUFFB:
+            case Booster::MANIPULATORBUFF:
                 circle.setFillColor(sf::Color::Green);
                 break;
             case Booster::CLONINGBUFF:
@@ -113,13 +113,13 @@ void GUI::updateBot(const Bot &bot)
     _botTexture.setPosition((bot.getCoords().x * _tileSize.x) + _tileSize.x / 2 - _botTexture.getRadius(),
                             (bot.getCoords().y * -_tileSize.y) - _tileSize.y / 2 - _botTexture.getRadius());
     _manipulatorTextures.clear();
+    double rad = bot.getDirection() * M_PI / 180;
     for (auto& dot : bot.getManipulator())
     {
         if (dot.second)
         {
-            double rad = bot.getDirection() * M_PI / 180;
-            int32_t manX = (dot.first.x * std::cos(rad) - dot.first.y * std::sin(rad)) + bot.getCoords().x;
-            int32_t manY = (dot.first.y * std::cos(rad) - dot.first.x * std::sin(rad)) + bot.getCoords().y;
+            int32_t manX = std::round((dot.first.x * std::cos(rad) - dot.first.y * std::sin(rad))) + bot.getCoords().x;
+            int32_t manY = std::round((dot.first.y * std::cos(rad) + dot.first.x * std::sin(rad))) + bot.getCoords().y;
 
             sf::RectangleShape rectangle(_tileSize);
             rectangle.setPosition(manX * _tileSize.x, (manY + 1) * -_tileSize.y);
@@ -130,19 +130,53 @@ void GUI::updateBot(const Bot &bot)
     }
 }
 
-bool GUI::checkCloseEvent()
+GUI::event GUI::checkEvent()
 {
-    bool result = false;
     sf::Event event;
-    while (_window.pollEvent(event))
+    if (!_window.pollEvent(event))
     {
-        if (event.type == sf::Event::Closed)
+        return LASTEV;
+    }
+    if (event.type == sf::Event::Closed)
+    {
+        abort();
+    }
+    if (event.type == sf::Event::KeyPressed)
+    {
+        if (event.key.code == sf::Keyboard::E)
         {
-            result = true;
-            _window.close();
+            return ROTATECL;
+        }
+        if (event.key.code == sf::Keyboard::Q)
+        {
+            return ROTATECCL;
+        }
+        if (event.key.code == sf::Keyboard::W)
+        {
+            return GOUP;
+        }
+        if (event.key.code == sf::Keyboard::S)
+        {
+            return GODOWN;
+        }
+        if (event.key.code == sf::Keyboard::A)
+        {
+            return GOLEFT;
+        }
+        if (event.key.code == sf::Keyboard::D)
+        {
+            return GORIGHT;
+        }
+        if (event.key.code == sf::Keyboard::E)
+        {
+            return ROTATECL;
+        }
+        if (event.key.code == sf::Keyboard::N)
+        {
+            return NEXT;
         }
     }
-    return result;
+    return EMPTY;
 }
 
 void GUI::draw()

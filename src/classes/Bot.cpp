@@ -18,9 +18,44 @@ Bot::Direction Bot::getDirection() const
     return _direction;
 }
 
+uint8_t Bot::getSpeed() const
+{
+    return _speed;
+}
+
+bool Bot::hasDrill() const
+{
+    return _drill;
+}
+
 const std::list<std::pair<sf::Vector2<int32_t>, bool>>& Bot::getManipulator() const
 {
     return _manipulator;
+}
+
+void Bot::move(sf::Vector2<int32_t> coords)
+{
+    _coords.x += coords.x;
+    _coords.y += coords.y;
+}
+
+void Bot::rotate(bool clockwise)
+{
+    if (!clockwise)
+    {
+        _direction = static_cast<Direction>((_direction + 90) % 360);
+    }
+    else
+    {
+        if (_direction == 0)
+        {
+            _direction = DOWN;
+        }
+        else
+        {
+            _direction = static_cast<Direction>(_direction - 90);
+        }
+    }
 }
 
 void Bot::addBooster(Booster::BoosterType type)
@@ -43,7 +78,7 @@ bool Bot::useBooster(Booster::BoosterType type, std::optional<sf::Vector2<int32_
             [type](const std::pair<Booster::BoosterType, short>& el){return el.first == type;});
         if (it != _activeBoosters.end())
         {
-            it->second = time;
+            it->second += time;
         }
         else
         {
@@ -57,17 +92,34 @@ bool Bot::useBooster(Booster::BoosterType type, std::optional<sf::Vector2<int32_
         --it->second;
         switch (type)
         {
-            case Booster::MANIPULATORBUFFB:
-                //todo
+            case Booster::MANIPULATORBUFF:
+            {
+                auto it = std::find_if(_manipulator.begin(), _manipulator.end(),
+                             [coords](const std::pair<sf::Vector2<int32_t>, bool>& el){
+                    auto &coordsVal = coords.value();
+                    bool result = el.first == coordsVal + sf::Vector2<int32_t>(1, 0);
+                    result = result || el.first == coordsVal + sf::Vector2<int32_t>(-1, 0);
+                    result = result || el.first == coordsVal + sf::Vector2<int32_t>(0, 1);
+                    result = result || el.first == coordsVal + sf::Vector2<int32_t>(0, -1);
+                    return result;
+                });
+                if (it == _manipulator.end())
+                {
+                    return false;
+                }
+                _manipulator.push_back(std::pair(coords.value(), false));
                 break;
+            }
             case Booster::CLONINGBUFF:
                 //todo
                 break;
             case Booster::FASTBUFF:
                 activateBooster(Booster::FASTTIME);
+                _speed = 2;
                 break;
             case Booster::DRILLBUFF:
                 activateBooster(Booster::DRILLTIME);
+                _drill = true;
                 break;
             case Booster::TELEPORTBUFF:
                 //todo

@@ -12,9 +12,9 @@ public:
     enum Direction: short
     {
         RIGHT = 0,
-        DOWN = 90,
+        UP = 90,
         LEFT = 180,
-        UP = 270
+        DOWN = 270
     };
 
     Bot(){}
@@ -22,14 +22,19 @@ public:
 
     sf::Vector2<uint32_t> getCoords() const;
     Direction getDirection() const;
+    uint8_t getSpeed() const;
+    bool hasDrill() const;
     const std::list<std::pair<sf::Vector2<int32_t>, bool>>& getManipulator() const;
 
+    void move(sf::Vector2<int32_t> coords);
+    void rotate(bool clockwise);
     void addBooster(Booster::BoosterType type);
     bool useBooster(Booster::BoosterType type, std::optional<sf::Vector2<int32_t>> coords);
 
 private:
     sf::Vector2<uint32_t> _coords;
-    char _speed{1};
+    uint8_t _speed{1};
+    bool _drill{false};
     Direction _direction = RIGHT;
     std::list<std::pair<sf::Vector2<int32_t>, bool>> _manipulator;
 

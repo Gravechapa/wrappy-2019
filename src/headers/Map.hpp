@@ -21,6 +21,7 @@ public:
         std::vector<sf::Vector2<uint32_t>> &contourMap,
         std::vector<std::vector<sf::Vector2<uint32_t>>> &obstacleMaps);
 
+    bool check(Bot &bot, sf::Vector2<int32_t> direction);
     void updateMap(Bot &bot);
     const std::vector<std::vector<short>>& getMap() const;
 
