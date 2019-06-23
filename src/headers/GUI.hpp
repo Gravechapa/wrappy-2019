@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 #include "Map.hpp"
+#include "Booster.hpp"
+#include <list>
 
 class GUI
 {
@@ -9,6 +11,7 @@ public:
     GUI(const std::string &name);
 
     void updateMap(Map &map);
+    void updateBoosters(const std::list<Booster> &boosters);
     bool checkCloseEvent();
     void draw();
 
@@ -19,4 +22,5 @@ private:
     sf::RenderWindow _window;
     sf::View _view;
     sf::VertexArray _tileMap;
+    std::list<sf::CircleShape> _boostersTextures;
 };

@@ -16,8 +16,8 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
         throw std::runtime_error("Corrupt file: " + path.string()
                                  + " pos: " + to_string(file.tellg()));};
 
-    auto readCoord = [&file, &fileError]()->std::pair<uint32_t, uint32_t>{
-        std::pair<uint32_t, uint32_t> coord;
+    auto readCoord = [&file, &fileError]()->sf::Vector2<uint32_t>{
+        sf::Vector2<uint32_t> coord;
         char c;
         file.get(c);
         if (c != '(')
@@ -25,7 +25,7 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
             fileError();
         }
 
-        file >> coord.first;
+        file >> coord.x;
 
         file.get(c);
         if (c != ',')
@@ -33,7 +33,7 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
             fileError();
         }
 
-        file >> coord.second;
+        file >> coord.y;
 
         file.get(c);
         if (c != ')')
@@ -44,14 +44,14 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
     };
 
     char c;
-    std::vector<std::pair<uint32_t, uint32_t>> contourMapBuffer;
+    std::vector<sf::Vector2<uint32_t>> contourMapBuffer;
     uint32_t xMax = 0;
     uint32_t yMax = 0;
     while (true)
     {
         auto coord = readCoord();
-        xMax = std::max(coord.first, xMax);
-        yMax = std::max(coord.second, yMax);
+        xMax = std::max(coord.x, xMax);
+        yMax = std::max(coord.y, yMax);
 
         contourMapBuffer.push_back(coord);
 
@@ -74,7 +74,7 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
         fileError();
     }
 
-    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> obstacleMapsBuffer(1);
+    std::vector<std::vector<sf::Vector2<uint32_t>>> obstacleMapsBuffer(1);
     file.get(c);
     file.unget();
     if (c != '#')
@@ -94,7 +94,7 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
             }
             else if (c == ';')
             {
-                obstacleMapsBuffer.push_back(std::vector<std::pair<uint32_t, uint32_t>>());
+                obstacleMapsBuffer.push_back(std::vector<sf::Vector2<uint32_t>>());
                 continue;
             }
             else
@@ -104,35 +104,42 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
         }
     }
 
-    std::queue<std::pair<short, std::pair<uint32_t, uint32_t>>> boosterMapBuffer;
     file.get(c);
     file.unget();
     if (c != '#')
     {
         while (file.get(c))
         {
-            short booster;
+            BoosterType booster;
             if (c == 'B')
             {
-                booster = CODEB;
+                booster = MANIPULATORBUFFB;
+            }
+            else if (c == 'C')
+            {
+                booster = CLONINGBUFF;
             }
             else if (c == 'F')
             {
-                booster = CODEF;
+                booster = FASTBUFF;
             }
             else if (c == 'L')
             {
-                booster = CODEL;
+                booster = DRILLBUFF;
+            }
+            else if (c == 'R')
+            {
+                booster = TELEPORTBUFF;
             }
             else if (c == 'X')
             {
-                booster = CODEX;
+                booster = BUFFX;
             }
             else
             {
                 fileError();
             }
-            boosterMapBuffer.push(std::pair(booster, readCoord()));
+            _boosters.push_back(Booster(booster, readCoord()));
 
             if (!file.get(c))
             {
@@ -144,13 +151,6 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
             }
         }
     }
-/*
-    while (!boosterMapBuffer.empty())
-    {
-        map._mineMap[boosterMapBuffer.front().second.second][boosterMapBuffer.front().second.first]
-                += boosterMapBuffer.front().first << 2;
-        boosterMapBuffer.pop();
-    }*/
     _map = Map(xMax, yMax, contourMapBuffer, obstacleMapsBuffer);
     _gui.updateMap(_map);
 }
@@ -159,6 +159,7 @@ void Simulation::run()
 {
     while(!_gui.checkCloseEvent())
     {
+        _gui.updateBoosters(_boosters);
         _gui.draw();
     }
 }

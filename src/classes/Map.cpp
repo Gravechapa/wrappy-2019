@@ -4,60 +4,60 @@
 #include <iostream>
 
 Map::Map(uint32_t x, uint32_t y,
-    std::vector<std::pair<uint32_t, uint32_t>> &contourMap,
-    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &obstacleMaps)
+    std::vector<sf::Vector2<uint32_t>> &contourMap,
+    std::vector<std::vector<sf::Vector2<uint32_t>>> &obstacleMaps)
 {
     _mineMap = std::vector(y, std::vector(x, short{WALL}));
     auto dotMaps = std::vector((y * 2) + 1, std::vector((x * 2) + 1, short{WALL}));
 
-    auto drawContour = [&dotMaps](short target, std::vector<std::pair<uint32_t, uint32_t>> &contour){
+    auto drawContour = [&dotMaps](short target, std::vector<sf::Vector2<uint32_t>> &contour){
         for (uint32_t k = 0; k < contour.size(); ++k)
         {
             uint32_t i, j;
             auto next = (k + 1) % contour.size();
-            if (contour[k].first == contour[next].first)
+            if (contour[k].x == contour[next].x)
             {
-                if (contour[k].second > contour[next].second)
+                if (contour[k].y > contour[next].y)
                 {
-                    i = contour[next].second;
-                    j = contour[k].second;
+                    i = contour[next].y;
+                    j = contour[k].y;
                 }
                 else
                 {
-                    i = contour[k].second;
-                    j = contour[next].second;
+                    i = contour[k].y;
+                    j = contour[next].y;
                 }
                 i *= 2;
                 j *= 2;
                 for (; i <= j; ++i)
                 {
-                    dotMaps[i][contour[next].first * 2] = target;
+                    dotMaps[i][contour[next].x * 2] = target;
                 }
             }
             else
             {
-                if (contour[k].first > contour[next].first)
+                if (contour[k].x > contour[next].x)
                 {
-                    i = contour[next].first;
-                    j = contour[k].first;
+                    i = contour[next].x;
+                    j = contour[k].x;
                 }
                 else
                 {
-                    i = contour[k].first;
-                    j = contour[next].first;
+                    i = contour[k].x;
+                    j = contour[next].x;
                 }
                 i *= 2;
                 j *= 2;
                 for (; i <= j; ++i)
                 {
-                    dotMaps[contour[next].second * 2][i] = target;
+                    dotMaps[contour[next].y * 2][i] = target;
                 }
             }
         }
     };
 
     auto fill = [&dotMaps](short target,
-            const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &contours){
+            const std::vector<std::vector<sf::Vector2<uint32_t>>> &contours){
             uint32_t intersectionDetectCounter;
             for (uint32_t i = 0; i < dotMaps.size(); ++i)
             {
@@ -85,14 +85,14 @@ Map::Map(uint32_t x, uint32_t y,
                             intersectionDetectCounter = 0;
                             continue;
                         }
-                        const std::vector<std::pair<uint32_t, uint32_t>> *contour = nullptr;
+                        const std::vector<sf::Vector2<uint32_t>> *contour = nullptr;
                         int32_t dotNumber;
                         for(auto &cont : contours)
                         {
                             auto it = std::find_if(
                                 cont.begin(), cont.end(),
-                                [i, j](const std::pair<uint32_t, uint32_t>& x){
-                                return x.first == (j - 1) / 2 && x.second == i / 2;
+                                [i, j](const sf::Vector2<uint32_t>& el){
+                                return el.x == (j - 1) / 2 && el.y == i / 2;
                             });
                             if (it !=  cont.end())
                             {
@@ -110,28 +110,28 @@ Map::Map(uint32_t x, uint32_t y,
 
                         int32_t nextVectorDirection;
                         int32_t prevVectorDirection;
-                        if ((*contour)[dotNumber].second == (*contour)[(dotNumber + 1) % contour->size()].second)
+                        if ((*contour)[dotNumber].y == (*contour)[(dotNumber + 1) % contour->size()].y)
                         {
-                            nextVectorDirection = (*contour)[(dotNumber + 2) % contour->size()].second -
-                                    (*contour)[(dotNumber + 1) % contour->size()].second;
+                            nextVectorDirection = (*contour)[(dotNumber + 2) % contour->size()].y -
+                                    (*contour)[(dotNumber + 1) % contour->size()].y;
                         }
                         else
                         {
-                            nextVectorDirection = (*contour)[(dotNumber + 1) % contour->size()].second -
-                                    (*contour)[(dotNumber)].second;
+                            nextVectorDirection = (*contour)[(dotNumber + 1) % contour->size()].y -
+                                    (*contour)[(dotNumber)].y;
                         }
 
-                        if ((*contour)[dotNumber].second ==
-                                (*contour)[dotNumber == 0 ? contour->size() - 1 : dotNumber - 1].second)
+                        if ((*contour)[dotNumber].y ==
+                                (*contour)[dotNumber == 0 ? contour->size() - 1 : dotNumber - 1].y)
                         {
                             prevVectorDirection =
-                                    (*contour)[dotNumber == 0 ? contour->size() - 1 : dotNumber - 1].second -
-                                    (*contour)[dotNumber < 2 ? contour->size() - 2 : dotNumber - 2].second;
+                                    (*contour)[dotNumber == 0 ? contour->size() - 1 : dotNumber - 1].y -
+                                    (*contour)[dotNumber < 2 ? contour->size() - 2 : dotNumber - 2].y;
                         }
                         else
                         {
-                            prevVectorDirection = (*contour)[dotNumber].second -
-                                    (*contour)[dotNumber == 0 ? contour->size() - 1 : dotNumber - 1].second;
+                            prevVectorDirection = (*contour)[dotNumber].y -
+                                    (*contour)[dotNumber == 0 ? contour->size() - 1 : dotNumber - 1].y;
                         }
 
                         if (nextVectorDirection == 0 || prevVectorDirection == 0)
@@ -142,7 +142,7 @@ Map::Map(uint32_t x, uint32_t y,
                         prevVectorDirection = prevVectorDirection > 0 ? 1 : -1;
                         if (nextVectorDirection + prevVectorDirection == 0)
                         {
-                            if ((j - 1) / 2 == (*contour)[(dotNumber + 1) % contour->size()].first)
+                            if ((j - 1) / 2 == (*contour)[(dotNumber + 1) % contour->size()].x)
                             {
                                 if (nextVectorDirection > 0)
                                 {
@@ -185,7 +185,7 @@ Map::Map(uint32_t x, uint32_t y,
     };
 
     drawContour(EMPTY, contourMap);
-    fill(EMPTY, std::vector<std::vector<std::pair<uint32_t, uint32_t>>>(1, contourMap));
+    fill(EMPTY, std::vector<std::vector<sf::Vector2<uint32_t>>>(1, contourMap));
 
     for (uint32_t i = 0; i < dotMaps.size() - 2; i += 2)
     {
