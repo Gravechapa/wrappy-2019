@@ -28,6 +28,7 @@ public:
 
     void move(sf::Vector2<int32_t> coords);
     void rotate(bool clockwise);
+    void updateTimers();
     void addBooster(Booster::BoosterType type);
     bool useBooster(Booster::BoosterType type, std::optional<sf::Vector2<int32_t>> coords);
 

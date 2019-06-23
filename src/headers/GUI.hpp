@@ -16,6 +16,8 @@ public:
         GORIGHT,
         ROTATECL,
         ROTATECCL,
+        DRILL,
+        SPEEDUP,
         LASTEV,
         EMPTY
     };

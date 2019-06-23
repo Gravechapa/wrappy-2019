@@ -1,4 +1,5 @@
 #include "Bot.hpp"
+#include <iostream>
 
 Bot::Bot(const sf::Vector2<uint32_t> &coords): _coords(coords)
 {
@@ -55,6 +56,30 @@ void Bot::rotate(bool clockwise)
         {
             _direction = static_cast<Direction>(_direction - 90);
         }
+    }
+}
+
+void Bot::updateTimers()
+{
+    for (auto it = _activeBoosters.begin() ; it != _activeBoosters.end();)
+    {
+        std::cout << static_cast<short>(it->first) << " " << (it->second) << std::endl;
+        if (it->second == 0)
+        {
+            switch (it->first)
+            {
+            case Booster::FASTBUFF:
+                _speed = 1;
+                break;
+            case Booster::DRILLBUFF:
+                _drill = false;
+                break;
+            }
+            it = _activeBoosters.erase(it);
+            continue;
+        }
+        --(it->second);
+        ++it;
     }
 }
 

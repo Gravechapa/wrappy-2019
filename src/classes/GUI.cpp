@@ -171,6 +171,14 @@ GUI::event GUI::checkEvent()
         {
             return ROTATECL;
         }
+        if (event.key.code == sf::Keyboard::F)
+        {
+            return SPEEDUP;
+        }
+        if (event.key.code == sf::Keyboard::L)
+        {
+            return DRILL;
+        }
         if (event.key.code == sf::Keyboard::N)
         {
             return NEXT;

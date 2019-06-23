@@ -210,7 +210,9 @@ void Simulation::move(Bot::Direction direction)
 void Simulation::useBooster(Booster::BoosterType type, std::optional<sf::Vector2<int32_t>> coords)
 {
     ++_time;
-
+    _bot.useBooster(type, coords);
+    _map.updateMap(_bot);
+    _gui.updateMap(_map);
 }
 
 void Simulation::run()
@@ -218,6 +220,7 @@ void Simulation::run()
     bool stop = false;
     while(!stop)
     {
+        auto prevTime = _time;
         bool stopPolling = false;
         while (!stopPolling)
         {
@@ -244,6 +247,12 @@ void Simulation::run()
             case GUI::ROTATECCL:
                 rotate(false);
                 break;
+            case GUI::DRILL:
+                useBooster(Booster::DRILLBUFF, std::nullopt);
+                break;
+            case GUI::SPEEDUP:
+                useBooster(Booster::FASTBUFF, std::nullopt);
+                break;
             case GUI::LASTEV:
                 stopPolling = true;
                 break;
@@ -251,6 +260,12 @@ void Simulation::run()
                 break;
             }
         }
+        //just for testing
+        for (uint32_t i = 0; i < _time - prevTime; ++i)
+        {
+            _bot.updateTimers();
+        }
+        /////////////////////////////
         _gui.updateBoosters(_boosters);
         _gui.updateBot(_bot);
         _gui.draw();

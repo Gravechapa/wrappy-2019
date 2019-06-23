@@ -248,7 +248,7 @@ bool Map::check(Bot &bot, sf::Vector2<int32_t> direction)
         {
             if (bot.hasDrill())
             {
-                _mineMap[targetY][targetX] == EMPTY;
+                _mineMap[targetY][targetX] = EMPTY;
                 return true;
             }
             return false;
