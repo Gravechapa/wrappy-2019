@@ -189,6 +189,15 @@ void Simulation::move(Bot::Direction direction)
         {
             _bot.move(offset);
             _map.updateMap(_bot);
+            for (auto it = _boosters.begin(); it!= _boosters.end(); ++it)
+            {
+                if (it->getCoords() == _bot.getCoords())
+                {
+                    _bot.addBooster(it->getType());
+                    _boosters.erase(it);
+                    break;
+                }
+            }
         }
         else
         {
