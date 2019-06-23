@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <SFML/System/Vector2.hpp>
+#include "Bot.hpp"
 
 class Map
 {
@@ -20,6 +21,7 @@ public:
         std::vector<sf::Vector2<uint32_t>> &contourMap,
         std::vector<std::vector<sf::Vector2<uint32_t>>> &obstacleMaps);
 
+    void updateMap(Bot &bot);
     const std::vector<std::vector<short>>& getMap() const;
 
 private:

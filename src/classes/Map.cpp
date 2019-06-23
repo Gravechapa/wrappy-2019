@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <iostream>
+#include <cmath>
 
 Map::Map(uint32_t x, uint32_t y,
     std::vector<sf::Vector2<uint32_t>> &contourMap,
@@ -231,6 +232,36 @@ Map::Map(uint32_t x, uint32_t y,
             {
                 _mineMap[i / 2][j / 2] = OBSTACLE;
             }
+        }
+    }
+}
+
+void Map::updateMap(Bot &bot)
+{
+    for (auto& dot : bot.getManipulator())
+    {
+        double rad = bot.getDirection() * M_PI / 180;
+        int32_t manX = (dot.first.x * std::cos(rad) - dot.first.y * std::sin(rad)) + bot.getCoords().x;
+        int32_t manY = (dot.first.y * std::cos(rad) - dot.first.x * std::sin(rad)) + bot.getCoords().y;
+
+        if (manY < _mineMap.size() && manX < _mineMap[0].size())
+        {
+            if (_mineMap[manY][manX] == EMPTY)
+            {
+                _mineMap[manY][manX] = PREPARED;
+                const_cast<bool&>(dot.second) = true;
+                continue;
+            }
+            if (_mineMap[manY][manX] == PREPARED)
+            {
+                const_cast<bool&>(dot.second) = true;
+                continue;
+            }
+            const_cast<bool&>(dot.second) = false;
+        }
+        else
+        {
+            const_cast<bool&>(dot.second) = false;
         }
     }
 }

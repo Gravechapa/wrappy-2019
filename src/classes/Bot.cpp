@@ -1,11 +1,26 @@
 #include "Bot.hpp"
 
 Bot::Bot(const sf::Vector2<uint32_t> &coords): _coords(coords)
-{}
+{
+    _manipulator.push_back(std::pair(sf::Vector2<int32_t>{0, 0}, false));
+    _manipulator.push_back(std::pair(sf::Vector2<int32_t>{1, 0}, false));
+    _manipulator.push_back(std::pair(sf::Vector2<int32_t>{1, 1}, false));
+    _manipulator.push_back(std::pair(sf::Vector2<int32_t>{1, -1}, false));
+}
 
 sf::Vector2<uint32_t> Bot::getCoords() const
 {
     return _coords;
+}
+
+Bot::Direction Bot::getDirection() const
+{
+    return _direction;
+}
+
+const std::list<std::pair<sf::Vector2<int32_t>, bool>>& Bot::getManipulator() const
+{
+    return _manipulator;
 }
 
 void Bot::addBooster(Booster::BoosterType type)
@@ -21,7 +36,7 @@ void Bot::addBooster(Booster::BoosterType type)
     }
 }
 
-bool Bot::useBooster(Booster::BoosterType type)
+bool Bot::useBooster(Booster::BoosterType type, std::optional<sf::Vector2<int32_t>> coords)
 {
     auto activateBooster = [type, this](short time){
         auto it = std::find_if(_activeBoosters.begin(), _activeBoosters.end(),

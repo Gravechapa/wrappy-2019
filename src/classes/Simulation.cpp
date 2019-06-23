@@ -152,6 +152,9 @@ Simulation::Simulation(const fs::path &path): _gui(GUI(path.filename()))
         }
     }
     _map = Map(xMax, yMax, contourMapBuffer, obstacleMapsBuffer);
+    //
+    _map.updateMap(_bot);
+    //
     _gui.updateMap(_map);
 }
 

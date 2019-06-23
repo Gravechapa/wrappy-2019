@@ -24,4 +24,5 @@ private:
     sf::VertexArray _tileMap;
     std::list<sf::CircleShape> _boostersTextures;
     sf::CircleShape _botTexture;
+    std::list<sf::RectangleShape> _manipulatorTextures;
 };

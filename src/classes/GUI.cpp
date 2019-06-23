@@ -1,4 +1,5 @@
 #include "GUI.hpp"
+#include <cmath>
 
 GUI::GUI(const std::string &name):
     _window(sf::RenderWindow (sf::VideoMode(_resolution.x, _resolution.y),
@@ -111,6 +112,22 @@ void GUI::updateBot(const Bot &bot)
 {
     _botTexture.setPosition((bot.getCoords().x * _tileSize.x) + _tileSize.x / 2 - _botTexture.getRadius(),
                             (bot.getCoords().y * -_tileSize.y) - _tileSize.y / 2 - _botTexture.getRadius());
+    _manipulatorTextures.clear();
+    for (auto& dot : bot.getManipulator())
+    {
+        if (dot.second)
+        {
+            double rad = bot.getDirection() * M_PI / 180;
+            int32_t manX = (dot.first.x * std::cos(rad) - dot.first.y * std::sin(rad)) + bot.getCoords().x;
+            int32_t manY = (dot.first.y * std::cos(rad) - dot.first.x * std::sin(rad)) + bot.getCoords().y;
+
+            sf::RectangleShape rectangle(_tileSize);
+            rectangle.setPosition(manX * _tileSize.x, (manY + 1) * -_tileSize.y);
+            rectangle.setFillColor(sf::Color(220, 20, 60, 90));
+            _manipulatorTextures.push_back(rectangle);
+        }
+
+    }
 }
 
 bool GUI::checkCloseEvent()
@@ -133,10 +150,14 @@ void GUI::draw()
     _window.clear(sf::Color::Black);
     _window.setView(_view);
     _window.draw(_tileMap);
-    _window.draw(_botTexture);
     for (auto &booster : _boostersTextures)
     {
         _window.draw(booster);
+    }
+    _window.draw(_botTexture);
+    for (auto &manipulator : _manipulatorTextures)
+    {
+        _window.draw(manipulator);
     }
     _window.display();
 }
